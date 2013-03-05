@@ -1,0 +1,39 @@
+// Place all the styles related to the static_pages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+@import "bootstrap";
+
+html, body, #page {
+	height: 100%;	
+	min-width: 650px;
+	min-height: 200px;
+}
+
+#page-body {
+  	margin-top: 60px;
+	padding-bottom: 3em;
+}
+
+.container {
+	text-align: center;
+}
+
+
+footer {
+ clear: both;
+ position: relative;
+ z-index: 10;
+ height: 3em;
+ margin-top: -3em;
+	
+ padding-top: 10px;
+ border-top: 1px solid #eee;
+ color: #888;
+ overflow: hidden; 
+}
+
+	
+.input-prepend {
+	font-size: 13px;
+}
