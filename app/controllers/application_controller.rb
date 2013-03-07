@@ -3,40 +3,43 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   
+  #Transilteration method
   def transliterate
     original_word = params[:original_word]
-    puts "\n\n\n\n" + original_word
+    #split to transform each character to arabic
     original_word_array = original_word.split(//)
-    puts original_word_array.inspect + "\n\n\n\n"
-    array = []
-    #@arabic = ""
+    
+    arabic_transformation_array = []
+
     original_word_array.each do |character|
-      array.unshift(CharacterConvertion.where("latin = '#{character}'").map(&:arabic))
-    #  @arabic << CharacterConvertion.find_by_latin(character).arabic
-      #this will find the first entry only        
+      arabic_transformation_array.unshift(CharacterConvertion.where("latin = '#{character}'").map(&:arabic))
     end
     
-    if array.length != 0
-      @results = combineAndJoin(array)
+    if arabic_transformation_array.length != 0
+      results = combineAndJoin(arabic_transformation_array)
     else
-      @results = []
+      results = []
     end
-    puts @results.inspect
-    #puts @arabic
-    render :json => {arabic_values: @results}
+    
+    #order by frequency desc from database
+    @valid_results = ArabicWord.where("word in ('#{results.join('\',\'')}')").order('frequency DESC').map(&:word)
+    for result in results
+      if !@valid_results.include? result
+        @valid_results.push(result)
+      end
+    end
+  
+    render :json => {arabic_values: @valid_results}
   end 
   
+  #create the different combinations
   def combination(word_array)
     if word_array.count == 1
-      puts "here"
-      puts word_array[0].inspect
       return word_array[0]
     else
       word0 = word_array.pop()
-      puts word0.inspect
       previous_array = combination(word_array)
       new_array = []
-          
       
       word0.each do |element2|          
         previous_array.each do |element|        
@@ -47,11 +50,8 @@ class ApplicationController < ActionController::Base
             sub_array = []
             sub_array.push(element.dup)          
           end
-   #       puts new_array.inspect     
-  #        puts element2 + element.inspect     
-          new_array.push(sub_array.unshift(element2))
- #         puts "--"
-#          puts new_array.inspect                    
+
+          new_array.push(sub_array.unshift(element2))        
         end
       end
 
@@ -62,6 +62,8 @@ class ApplicationController < ActionController::Base
   def combineAndJoin(array)
     splitted_resluts = combination(array)
     results = []
+    
+    #join distinct words
     splitted_resluts.each do |splitted_word|
       if splitted_word.kind_of?(Array)      
         results.push(splitted_word.join(''))
@@ -69,6 +71,7 @@ class ApplicationController < ActionController::Base
         results.push(splitted_word)
       end
     end
+    
     return results
   end
   

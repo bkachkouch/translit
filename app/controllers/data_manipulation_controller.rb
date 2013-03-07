@@ -1,6 +1,7 @@
 #!/bin/env ruby
 # encoding: utf-8
 class DataManipulationController < ApplicationController
+  #insert characters conversion to database
   def insert_conversion_data
     CharacterConvertion.create({arabic:'آ',latin:'2'})
     CharacterConvertion.create({arabic:'ء',latin:'2'})
@@ -85,6 +86,7 @@ class DataManipulationController < ApplicationController
     CharacterConvertion.create({arabic:'ى',latin:'a'})
   end
   
+  #insert arabic words to database
   def read_arabic_words
     file = File.new("arabic_words.txt", "r")
     while (line = file.gets)
