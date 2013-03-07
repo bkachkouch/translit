@@ -36,8 +36,6 @@ $(document).ready ->
 
 	
 	$("input").keyup (e)->
-		if $('.dropdown').hasClass('open')
-			$('.dropdown-toggle').dropdown('toggle')						
 		
 		#read current word
 		text = $("input").val()
@@ -80,6 +78,8 @@ $(document).ready ->
 				console.log data.arabic_values
 
 				if (e.keyCode == 32) #space key
+					if $('.dropdown').hasClass('open')
+						$('.dropdown-toggle').dropdown('toggle')
 					text = removeCurrentWord(text,cursor_position)				
 					text = replaceAt(text,cursor_position,data.arabic_values[0])					
 					$("input").val(text)
@@ -87,14 +87,19 @@ $(document).ready ->
 					if $('.dropdown').hasClass('open')
 						$('.dropdown-toggle').dropdown('toggle')
 				else if(e.keyCode == 38 || e.keyCode == 40) #up or down keys
-					$('.dropdown-toggle').dropdown('toggle')			
+					if !$('.dropdown').hasClass('open')
+						$('.dropdown-toggle').dropdown('toggle')			
 					$(".dropdown-menu a:first").focus()		
 				else
 					$(".dropdown-menu").empty()
 					for arabic_value in data.arabic_values
 						$(".dropdown-menu").append("<li><a href='#'>#{arabic_value}</a></li>");
 					if $(".dropdown-menu").length != 0
-						$('.dropdown-toggle').dropdown('toggle')			
+						if !$('.dropdown').hasClass('open')
+							$('.dropdown-toggle').dropdown('toggle')
+					else
+						if $('.dropdown').hasClass('open')
+							$('.dropdown-toggle').dropdown('toggle')								
 			error:(data) ->
 				console.log "Error in transliteration"
 				console.log data.arabic_value
