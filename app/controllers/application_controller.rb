@@ -16,8 +16,11 @@ class ApplicationController < ActionController::Base
       #this will find the first entry only        
     end
     
-    @results = combineAndJoin(array)
-
+    if array.length != 0
+      @results = combineAndJoin(array)
+    else
+      @results = []
+    end
     puts @results.inspect
     #puts @arabic
     render :json => {arabic_values: @results}

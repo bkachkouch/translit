@@ -1,6 +1,7 @@
 # Place all the behaviors and hooks related to the matching controller here.
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
+results = [] 
 
 replaceAt = (string, index, new_value) ->
   string.substring(0, index) + new_value + " "+ string.substring(index + 1)
@@ -24,29 +25,35 @@ removeCurrentWord = (text,cursor_position) ->
 	current_word_array.join('')
 			
 $(document).ready ->
+	$("input").focus()
 	
-	$(".dropdown-menu").on "click", "a", ->
+	$(".dropdown-menu").on "click", "#moreResults", (e)->
+		$(".dropdown-menu").empty()
+		for arabic_value in results
+			$(".dropdown-menu").append("<li><a href='#' class='result'>#{arabic_value}</a></li>");			
+		e.stopPropagation();
+		
+	$(".dropdown-menu").on "click", ".result", ->
 		cursor_position = $("input").prop("selectionStart")
 		text = $("input").val()
 		text = removeCurrentWord(text,cursor_position)	
-		console.log $(this)
 		text = replaceAt(text,cursor_position, $(this).text())					
 		$("input").val(text)
 		$("input").focus()
 
+	$("input").focus ->
+		if $('.dropdown').hasClass('open')
+			$('.dropdown-toggle').dropdown('toggle')
 	
 	$("input").keyup (e)->
 		
 		#read current word
 		text = $("input").val()
 		text_array = text.split('')
-		console.log text_array
 		cursor_position = $("input").prop("selectionStart")
-#		console.log cursor_position
 		if (e.keyCode == 32) 
 			cursor_position = cursor_position - 1
 			
-		console.log cursor_position
 		current_word_array = []
 				
 		if cursor_position > 0
@@ -62,8 +69,6 @@ $(document).ready ->
 			else
 				current_word_array.push(text_array[i])				
 		
-		
-		console.log current_word_array
 		current_word = current_word_array.join('')		
 	
 		#send the word to the transliteration algorithm
@@ -71,30 +76,42 @@ $(document).ready ->
 			type: "GET"
 			url: "/transliterate"
 			dataType: "json"
-			data: {original_word:current_word}
+			data: {original_word:current_word.toLowerCase()}
 			
 			success: (data) ->
 				console.log "Transliteration success"
 				console.log data.arabic_values
-
+				results = data.arabic_values
 				if (e.keyCode == 32) #space key
 					if $('.dropdown').hasClass('open')
 						$('.dropdown-toggle').dropdown('toggle')
-					text = removeCurrentWord(text,cursor_position)				
-					text = replaceAt(text,cursor_position,data.arabic_values[0])					
-					$("input").val(text)
+					if results[0]
+						text = removeCurrentWord(text,cursor_position)				
+						text = replaceAt(text,cursor_position,results[0])					
+						$("input").val(text)
 				else if (e.keyCode == 27) #esc key
 					if $('.dropdown').hasClass('open')
 						$('.dropdown-toggle').dropdown('toggle')
 				else if(e.keyCode == 38 || e.keyCode == 40) #up or down keys
-					if !$('.dropdown').hasClass('open')
-						$('.dropdown-toggle').dropdown('toggle')			
-					$(".dropdown-menu a:first").focus()		
+					if $(".dropdown-menu a").length != 0
+						if !$('.dropdown').hasClass('open')
+							$('.dropdown-toggle').dropdown('toggle')			
+						$(".dropdown-menu a:first").focus()		
 				else
-					$(".dropdown-menu").empty()
-					for arabic_value in data.arabic_values
-						$(".dropdown-menu").append("<li><a href='#'>#{arabic_value}</a></li>");
-					if $(".dropdown-menu").length != 0
+					$(".dropdown-menu").empty()					
+					#for arabic_value in results
+					#	$(".dropdown-menu").append("<li><a href='#'>#{arabic_value}</a></li>");
+					if results.length > 3
+						$(".dropdown-menu").append("<li><a href='#' class='result'>#{results[0]}</a></li>");
+						$(".dropdown-menu").append("<li><a href='#' class='result'>#{results[1]}</a></li>");
+						$(".dropdown-menu").append("<li><a href='#' class='result'>#{results[2]}</a></li>");												
+						$(".dropdown-menu").append("<li class='divider'></li><li><a href='#' id='moreResults'><I>More...<I></a></li>");						
+					else
+
+						for arabic_value in results
+							$(".dropdown-menu").append("<li><a href='#' class='result'>#{arabic_value}</a></li>");
+		
+					if $(".dropdown-menu a").length != 0
 						if !$('.dropdown').hasClass('open')
 							$('.dropdown-toggle').dropdown('toggle')
 					else
@@ -102,5 +119,6 @@ $(document).ready ->
 							$('.dropdown-toggle').dropdown('toggle')								
 			error:(data) ->
 				console.log "Error in transliteration"
-				console.log data.arabic_value
+				if $('.dropdown').hasClass('open')
+					$('.dropdown-toggle').dropdown('toggle')
 
