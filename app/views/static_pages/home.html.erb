@@ -1,8 +1,19 @@
-<div id="page-body" class="container">
-	<form class="form-search">
-		<div class="input-prepend">
-			<button type="submit" class="btn">Transliterate</button>
-			<input type="text" style="text-align:right" placeholder="Type something..." class="span5 search-query" data-provide="typeahead" data-source=""> 
-		</div>
-	</form>
-</div>
+<form class="form-search">
+	<div class="input-prepend">
+		<button type="submit" class="btn">Transliterate</button>
+		<input type="text" style="text-align:right" placeholder="Type something..." class="span5 search-query" data-provide="typeahead" data-source=""> 
+		
+		<div class="dropdown pull-right">
+		  <a class="dropdown-toggle" id="dLabel" role="button" data-toggle="dropdown" data-target="#">
+<!--		    <b class="caret"></b>-->
+		  </a>
+		  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+			<li>1</li>
+			<li>2</li>		
+		    ...
+		  </ul>
+		</div>		
+	</div>
+	
+
+</form>

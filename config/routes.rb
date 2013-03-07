@@ -1,7 +1,8 @@
 Transliteration::Application.routes.draw do
   root :to => 'static_pages#home'
-  get '/insert',  :to => 'application#insert'
-    get '/transliterate',  :to => 'application#transliterate'
+  get '/insertConversionData',  :to => 'application#insert_conversion_data'
+  get '/transliterate',  :to => 'data_manipulation#transliterate'
+  get '/addWords', :to => 'data_manipulation#read_arabic_words'
   
   # The priority is based upon order of creation:
   # first created -> highest priority.

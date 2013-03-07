@@ -25,7 +25,20 @@ removeCurrentWord = (text,cursor_position) ->
 			
 $(document).ready ->
 	
+	$(".dropdown-menu").on "click", "a", ->
+		cursor_position = $("input").prop("selectionStart")
+		text = $("input").val()
+		text = removeCurrentWord(text,cursor_position)	
+		console.log $(this)
+		text = replaceAt(text,cursor_position, $(this).text())					
+		$("input").val(text)
+		$("input").focus()
+
+	
 	$("input").keyup (e)->
+		if $('.dropdown').hasClass('open')
+			$('.dropdown-toggle').dropdown('toggle')						
+		
 		#read current word
 		text = $("input").val()
 		text_array = text.split('')
@@ -64,20 +77,24 @@ $(document).ready ->
 			
 			success: (data) ->
 				console.log "Transliteration success"
-				console.log data.arabic_value
-#				possibilities = ["PHP", "MySQL", "SQL", "PostgreSQL", "HTML", "CSS", "HTML5", "CSS3", "JSON"]				
-#				possibilities = [data[0].arabic,data[1].arabic]	
-#				console.log possibilities
-		#		console.log replaceAt(text,1,data.arabic_value)
-#				autocomplete = $("input").typeahead()
-#				autocomplete.data("typeahead").source = possibilities
-				if (e.keyCode == 32) 
-#					alert data.arabic_value
-					text = removeCurrentWord(text,cursor_position)
-#					console.log text					
-					text = replaceAt(text,cursor_position,data.arabic_value)					
-#					console.log text
+				console.log data.arabic_values
+
+				if (e.keyCode == 32) #space key
+					text = removeCurrentWord(text,cursor_position)				
+					text = replaceAt(text,cursor_position,data.arabic_values[0])					
 					$("input").val(text)
+				else if (e.keyCode == 27) #esc key
+					if $('.dropdown').hasClass('open')
+						$('.dropdown-toggle').dropdown('toggle')
+				else if(e.keyCode == 38 || e.keyCode == 40) #up or down keys
+					$('.dropdown-toggle').dropdown('toggle')			
+					$(".dropdown-menu a:first").focus()		
+				else
+					$(".dropdown-menu").empty()
+					for arabic_value in data.arabic_values
+						$(".dropdown-menu").append("<li><a href='#'>#{arabic_value}</a></li>");
+					if $(".dropdown-menu").length != 0
+						$('.dropdown-toggle').dropdown('toggle')			
 			error:(data) ->
 				console.log "Error in transliteration"
 				console.log data.arabic_value
